@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import "./Signup.css";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -10,7 +10,8 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [createUserWithEmailAndPassword] =
+  const navigate = useNavigate();
+  const [createUserWithEmailAndPassword, hookError, user] =
     useCreateUserWithEmailAndPassword(auth);
 
   const handleEmailBlur = (event) => {
@@ -23,6 +24,10 @@ const Signup = () => {
     setConfirmPassword(event.target.value);
   };
 
+  if (user) {
+    navigate("/shop");
+  }
+
   const handleCreateUser = (event) => {
     event.preventDefault();
     if (password !== confirmPassword) {
@@ -33,10 +38,7 @@ const Signup = () => {
       setError("Password must be more than 6 character");
       return;
     }
-    createUserWithEmailAndPassword(email, password).then((result) => {
-      const user = result.user;
-      console.log(user);
-    });
+    createUserWithEmailAndPassword(email, password);
   };
   return (
     <div className="form-container">
@@ -74,6 +76,7 @@ const Signup = () => {
             />
           </div>
           <p style={{ color: "red" }}>{error}</p>
+          <p style={{ color: "red" }}>{hookError}</p>
           <input className="form-submit" type="submit" value="Sign Up" />
         </form>
         <p>
